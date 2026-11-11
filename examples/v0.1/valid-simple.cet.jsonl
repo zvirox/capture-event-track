@@ -1,0 +1,7 @@
+{"cet":"0.1","type":"header","recorder":{"name":"SSP","version":"0.3.0","platform":"linux-wayland"},"video":{"file":"demo.mkv","size_bytes":123456789,"fp":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","fps":60,"width":2560,"height":1440},"clock":{"t0":"first_video_frame","unit":"ns","wall_start_utc":"2026-11-10T09:00:00.000Z"},"displays":[{"id":"d0","x":0,"y":0,"w":2560,"h":1440,"scale":1.0,"primary":true}],"capture":{"mode":"display","display_id":"d0","region":null,"window_id":null},"privacy":{"keys":"classes_only","text":"off","named_shortcuts":"off","redactions":["password_fields"]},"trust":{"untrusted_fields":["window.title","app.name","ui.label","mark.note"]}}
+{"t":16666666,"type":"cursor","x":1280,"y":720,"nx":0.5,"ny":0.5,"shape":"arrow"}
+{"t":33333333,"type":"window","id":"w_1","app":"Code","title":"main.rs - easy-edits-pro","x":0,"y":0,"w":2560,"h":1440,"state":"focused"}
+{"t":50000000,"type":"button","x":1280,"y":720,"button":"left","action":"down"}
+{"t":66666666,"type":"button","x":1280,"y":720,"button":"left","action":"up"}
+{"t":83333333,"type":"zoom_hint","x":1200,"y":680,"w":400,"h":300,"reason":"click_focus"}
+{"t":100000000,"type":"mark","kind":"chapter","note":"Getting Started"}

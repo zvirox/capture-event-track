@@ -1,0 +1,13 @@
+{"cet":"0.1","type":"header","recorder":{"name":"SSP","version":"0.3.0","platform":"linux-wayland"},"video":{"file":"full-feature.mkv","size_bytes":987654321,"fp":"sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210","fps":60,"width":1920,"height":1080},"clock":{"t0":"first_video_frame","unit":"ns","wall_start_utc":"2026-11-10T10:00:00.000Z"},"displays":[{"id":"d0","x":0,"y":0,"w":1920,"h":1080,"scale":1.0,"primary":true}],"capture":{"mode":"display","display_id":"d0","region":null,"window_id":null},"privacy":{"keys":"classes_only","text":"on","named_shortcuts":"on","redactions":["password_fields"]},"trust":{"untrusted_fields":["window.title","app.name","ui.label","mark.note","text.text"]}}
+{"t":16666666,"type":"cursor","x":500,"y":300,"nx":0.2604,"ny":0.2778,"shape":"arrow"}
+{"t":33333333,"type":"window","id":"w_editor","app":"Terminal","title":"zsh - cargo check","x":100,"y":100,"w":1200,"h":800,"state":"focused"}
+{"t":50000000,"type":"scroll","x":500,"y":300,"dx":0,"dy":-120,"unit":"pixel"}
+{"t":66666666,"type":"key","class":"letter","mods":["ctrl"],"action":"down","name":"s"}
+{"t":83333333,"type":"key","class":"letter","mods":["ctrl"],"action":"up","name":"s"}
+{"t":100000000,"type":"text","text":"git status","field":"terminal"}
+{"t":120000000,"type":"ui","role":"button","label":"Save File","x":450,"y":280,"w":100,"h":40}
+{"t":150000000,"type":"audio","source":"mic","state":"unmuted"}
+{"t":180000000,"type":"pause","action":"pause"}
+{"t":200000000,"type":"pause","action":"resume"}
+{"t":220000000,"type":"annotation","shape":"arrow","points":[[100,100],[300,300]],"duration":1000000000}
+{"t":250000000,"type":"x-ssp-focus-ring","radius":32,"color":"#ff00ff"}

@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capture-event-track.org/schema/v0.1/cet-0.1.schema.json",
+  "title": "Capture Event Track (CET) Record Schema v0.1",
+  "description": "JSON Schema validating Line 1 header and subsequent Line 2+ event records in a CET stream.",
+  "oneOf": [
+    { "$ref": "#/$defs/header" },
+    { "$ref": "#/$defs/event" }
+  ],
+  "$defs": {
+    "header": {
+      "type": "object",
+      "required": ["cet", "type", "recorder", "video", "clock", "displays", "capture", "privacy", "trust"],
+      "properties": {
+        "cet": { "type": "string", "const": "0.1" },
+        "type": { "type": "string", "const": "header" },
+        "recorder": {
+          "type": "object",
+          "required": ["name", "version", "platform"],
+          "properties": {
+            "name": { "type": "string", "maxLength": 128 },
+            "version": { "type": "string", "maxLength": 64 },
+            "platform": { "type": "string", "maxLength": 128 }
+          }
+        },
+        "video": {
+          "type": "object",
+          "required": ["file", "size_bytes", "fp", "fps", "width", "height"],
+          "properties": {
+            "file": { "type": "string", "maxLength": 512 },
+            "size_bytes": { "type": "integer", "minimum": 0 },
+            "fp": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+            "fps": { "type": "number", "exclusiveMinimum": 0 },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "clock": {
+          "type": "object",
+          "required": ["t0", "unit"],
+          "properties": {
+            "t0": { "type": "string", "enum": ["first_video_frame"] },
+            "unit": { "type": "string", "enum": ["ns"] },
+            "wall_start_utc": { "type": "string", "format": "date-time" },
+            "quality": { "type": "string", "enum": ["exact", "approximate"] },
+            "max_skew_ms": { "type": "number", "minimum": 0 },
+            "gaps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["after_t", "wall_gap_ms"],
+                "properties": {
+                  "after_t": { "type": "integer", "minimum": 0 },
+                  "wall_gap_ms": { "type": "number", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "displays": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "x", "y", "w", "h", "scale"],
+            "properties": {
+              "id": { "type": "string" },
+              "x": { "type": "integer" },
+              "y": { "type": "integer" },
+              "w": { "type": "integer", "minimum": 1 },
+              "h": { "type": "integer", "minimum": 1 },
+              "scale": { "type": "number", "exclusiveMinimum": 0 },
+              "primary": { "type": "boolean" }
+            }
+          }
+        },
+        "capture": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": { "type": "string", "enum": ["display", "window", "region"] },
+            "display_id": { "type": ["string", "null"] },
+            "window_id": { "type": ["string", "null"] },
+            "region": {
+              "type": ["object", "null"],
+              "properties": {
+                "x": { "type": "integer" },
+                "y": { "type": "integer" },
+                "w": { "type": "integer", "minimum": 1 },
+                "h": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "required": ["keys", "text"],
+          "properties": {
+            "keys": { "type": "string", "enum": ["classes_only", "off"] },
+            "text": { "type": "string", "enum": ["on", "off"] },
+            "named_shortcuts": { "type": "string", "enum": ["on", "off"] },
+            "redactions": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "trust": {
+          "type": "object",
+          "required": ["untrusted_fields"],
+          "properties": {
+            "untrusted_fields": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "derived_from": { "type": "string" }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["t", "type"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" }
+      },
+      "oneOf": [
+        { "$ref": "#/$defs/cursor_event" },
+        { "$ref": "#/$defs/button_event" },
+        { "$ref": "#/$defs/scroll_event" },
+        { "$ref": "#/$defs/key_event" },
+        { "$ref": "#/$defs/text_event" },
+        { "$ref": "#/$defs/window_event" },
+        { "$ref": "#/$defs/ui_event" },
+        { "$ref": "#/$defs/mark_event" },
+        { "$ref": "#/$defs/zoom_hint_event" },
+        { "$ref": "#/$defs/audio_event" },
+        { "$ref": "#/$defs/pause_event" },
+        { "$ref": "#/$defs/annotation_event" },
+        { "$ref": "#/$defs/vendor_event" }
+      ]
+    },
+    "cursor_event": {
+      "type": "object",
+      "required": ["t", "type", "x", "y", "nx", "ny"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "cursor" },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "nx": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "ny": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "shape": { "type": "string", "enum": ["arrow", "ibeam", "hand", "wait", "resize", "custom"] },
+        "off": { "type": "boolean" }
+      }
+    },
+    "button_event": {
+      "type": "object",
+      "required": ["t", "type", "x", "y", "button", "action"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "button" },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "button": { "type": "string", "enum": ["left", "right", "middle", "other"] },
+        "action": { "type": "string", "enum": ["down", "up"] },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "scroll_event": {
+      "type": "object",
+      "required": ["t", "type", "x", "y", "dx", "dy", "unit"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "scroll" },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "dx": { "type": "number" },
+        "dy": { "type": "number" },
+        "unit": { "type": "string", "enum": ["pixel", "line", "page"] }
+      }
+    },
+    "key_event": {
+      "type": "object",
+      "required": ["t", "type", "class", "mods", "action"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "key" },
+        "class": {
+          "type": "string",
+          "enum": ["letter", "digit", "punct", "nav", "function", "edit", "enter", "space", "modifier", "other"]
+        },
+        "mods": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["ctrl", "alt", "shift", "meta"] }
+        },
+        "action": { "type": "string", "enum": ["down", "up"] },
+        "name": { "type": "string", "maxLength": 32 }
+      }
+    },
+    "text_event": {
+      "type": "object",
+      "required": ["t", "type", "text", "field"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "text" },
+        "text": { "type": "string", "maxLength": 1024 },
+        "field": { "type": "string", "enum": ["search", "editor", "terminal", "other"] }
+      }
+    },
+    "window_event": {
+      "type": "object",
+      "required": ["t", "type", "id", "app", "title", "x", "y", "w", "h", "state"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "window" },
+        "id": { "type": "string" },
+        "app": { "type": "string", "maxLength": 256 },
+        "title": { "type": "string", "maxLength": 1024 },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "w": { "type": "integer", "minimum": 0 },
+        "h": { "type": "integer", "minimum": 0 },
+        "state": { "type": "string", "enum": ["focused", "moved", "resized", "minimized", "closed", "opened"] }
+      }
+    },
+    "ui_event": {
+      "type": "object",
+      "required": ["t", "type", "role", "x", "y", "w", "h"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "ui" },
+        "role": { "type": "string", "maxLength": 64 },
+        "label": { "type": "string", "maxLength": 1024 },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "w": { "type": "integer", "minimum": 0 },
+        "h": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "mark_event": {
+      "type": "object",
+      "required": ["t", "type", "kind"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "mark" },
+        "kind": { "type": "string", "enum": ["chapter", "highlight", "mistake", "cut_here", "note"] },
+        "note": { "type": "string", "maxLength": 1024 }
+      }
+    },
+    "zoom_hint_event": {
+      "type": "object",
+      "required": ["t", "type", "x", "y", "w", "h", "reason"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "zoom_hint" },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "w": { "type": "integer", "minimum": 1 },
+        "h": { "type": "integer", "minimum": 1 },
+        "reason": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "audio_event": {
+      "type": "object",
+      "required": ["t", "type", "source", "state"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "audio" },
+        "source": { "type": "string", "enum": ["mic", "system"] },
+        "state": { "type": "string", "enum": ["muted", "unmuted", "device_changed"] }
+      }
+    },
+    "pause_event": {
+      "type": "object",
+      "required": ["t", "type", "action"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "pause" },
+        "action": { "type": "string", "enum": ["pause", "resume"] }
+      }
+    },
+    "annotation_event": {
+      "type": "object",
+      "required": ["t", "type", "shape", "points", "duration"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "const": "annotation" },
+        "shape": { "type": "string", "enum": ["arrow", "rectangle", "ellipse", "freehand"] },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "duration": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "vendor_event": {
+      "type": "object",
+      "required": ["t", "type"],
+      "properties": {
+        "t": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string", "pattern": "^x-" }
+      },
+      "additionalProperties": true
+    }
+  }
+}
